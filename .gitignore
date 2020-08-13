@@ -1,0 +1,10 @@
+*.pro.user
+*.user*
+*.o
+moc_*
+*.autosave
+Makefile
+ui_*
+qrc_*
+
+build-*
