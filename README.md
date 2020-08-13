@@ -1,2 +1,2 @@
-# exGOF
-Study design pattern
+# exGoF
+学习设计模式
