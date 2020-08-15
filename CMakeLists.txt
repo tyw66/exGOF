@@ -10,3 +10,5 @@ target_link_libraries(singleton ${CMAKE_THREAD_LIBS_INIT})
 
 
 add_executable(factory p02_factory.cpp)
+
+add_executable(observe p03_observe.cpp)
