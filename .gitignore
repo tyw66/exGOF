@@ -7,4 +7,4 @@ Makefile
 ui_*
 qrc_*
 
-build-*
+build*

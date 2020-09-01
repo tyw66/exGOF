@@ -1,0 +1,2 @@
+add_executable(observe p03_observe.cpp testwidget.cpp)
+target_include_directories(observe PRIVATE CMAKE_CURRENT_SOURCE_DIR)
