@@ -124,6 +124,7 @@ public:
 
 /*主程序*/
 int main(){
+
     Singleton01::insteace()->showMessage();
 
     Singleton02::insteace()->showMessage();
@@ -134,8 +135,7 @@ int main(){
 
     Singleton05::getInstance().showMessage(NULL);
 
-
-
+    getchar();
     return 0;
 }
 
@@ -159,6 +159,8 @@ int main(){
     }
     //等各个线程退出后，进程才结束，否则进程强制结束了，线程可能还没反应过来；
     pthread_exit(NULL);
+
+    getchar();
 }
 
 #endif

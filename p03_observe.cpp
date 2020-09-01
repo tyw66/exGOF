@@ -1,5 +1,5 @@
 /******************************
- * ¹Û²ìÕßÄ£Ê½
+ * è§‚å¯Ÿè€…æ¨¡å¼
  ******************************/
 #include <iostream>
 #include <vector>
@@ -8,128 +8,168 @@
 using namespace std;
 
 class Observer;
- 
+
 /*------------------------------------------*
- *Í¨Öª£¨·¢²¼£©Õß»ùÀà 
+ *é€šçŸ¥ï¼ˆå‘å¸ƒï¼‰è€…åŸºç±» 
  *------------------------------------------*/
-class Subject{
+class Subject
+{
 public:
-	Subject(){}
-	~Subject(){}	
-	
-	void attach(Observer* ob);
-	void dettach(Observer* ob);
-	
-	void notify(); 
-	
-	std::string getState()const{ return m_state;}
-	void setState(const std::string& state){m_state = state;}
+	Subject();
+	~Subject();
+
+	void attach(Observer *ob);
+	void dettach(Observer *ob);
+
+	void notify();
+
+	std::string getState() const { return m_state; }
+	void setState(const std::string &state) { m_state = state; }
 
 private:
-	std::list<Observer*> m_observers;
+	std::list<Observer *> m_observers;
 
 	string m_state;
 };
 
-void Subject::attach(Observer* ob){
-	if(ob){
+void Subject::attach(Observer *ob)
+{
+	if (ob)
+	{
 		m_observers.push_back(ob);
-	}	
-};
-
-void Subject::dettach(Observer* ob){
-	if(ob){
-		m_observers.remove(ob);
-	}	
-};
-
-void Subject::notify(){
-	for(Observer* ob  : m_observers){
-		ob->update();		
-	}		
-};
- 
- 
-/*------------------------------------------*
- *¹Û²ì£¨¶©ÔÄ£©Õß»ùÀà 
- *------------------------------------------*/
-class Observer{
-public:
-	Observer(Subject* subject);
-	~Observer(){}
-	
-protected:
- 	virtual void update() = 0;	
-	
-	Subject* m_subject;
-
-};
-
-Observer::Observer(Subject* subject){
-	if(subject){
-		m_subject = subject;
-		m_subject->attach(this);	
 	}
 };
 
- 
-/*------------------------------------------*
- *Íø¸ñÍ¼£¬¼Ì³Ğ×ÔSubject
- *------------------------------------------*/ 
-class MeshPlot : public Subject{
-
-	
-};
- 
- 
-/*------------------------------------------*
- *Í¼ĞÎÇø£¬¼Ì³Ğ×ÔObserver
- *------------------------------------------*/ 
-class ViewerWidget : public Observer{
-protected:
-  	void update();	
-};
-void ViewerWidget::update(){
-	cout << "Í¼ĞÎÇø¸üĞÂ£º" << m_subject->getState();
-};
-  
-  
-/*------------------------------------------*
- *ÊôĞÔÇø£¬¼Ì³Ğ×ÔObserver
- *------------------------------------------*/ 
-class PropertyWidget : public Observer{
-protected:
-  	void update(); 
-};
-void PropertyWidget::update(){
-	cout << "ÊôĞÔÇø¸üĞÂ£º" << m_subject->getState();
+void Subject::dettach(Observer *ob)
+{
+	if (ob)
+	{
+		m_observers.remove(ob);
+	}
 };
 
+/*------------------------------------------*
+ *ç½‘æ ¼å›¾ï¼Œç»§æ‰¿è‡ªSubject
+ *------------------------------------------*/
+class MeshPlot : public Subject
+{
+};
 
 /*------------------------------------------*
- *ÈÕÖ¾Çø£¬¼Ì³Ğ×ÔObserver
- *------------------------------------------*/ 
-class LoggerWidget : public Observer{
+ *è§‚å¯Ÿï¼ˆè®¢é˜…ï¼‰è€…åŸºç±» 
+ *------------------------------------------*/
+class Observer
+{
+public:
+	Observer(Subject *subject);
+	~Observer() {}
+
+	virtual void update() = 0;
+	virtual void subjectRemoved(Subject *) { m_subject = 0; }
+
 protected:
-  	void update(); 
+	Subject *m_subject;
 };
-void LoggerWidget::update(){
-	cout << "ÈÕÖ¾Çø¸üĞÂ£º" << m_subject->getState();
+
+Observer::Observer(Subject *subject)
+{
+	if (subject)
+	{
+		m_subject = subject;
+		m_subject->attach(this);
+	}
 };
- 
- 
+
 /*------------------------------------------*
- *Ö÷º¯Êı
- *------------------------------------------*/ 
-int main(){
- 	MeshPlot meshPlot;
+ *å›¾å½¢åŒºï¼Œç»§æ‰¿è‡ªObserver
+ *------------------------------------------*/
+class ViewerWidget : public Observer
+{
+public:
+	ViewerWidget(Subject *sub);
+
+	void update();
+};
+
+ViewerWidget::ViewerWidget(Subject *sub) : Observer(sub)
+{
+}
+
+void ViewerWidget::update()
+{
+	cout << "viewer widget update. " << m_subject->getState() << endl;
+};
+
+/*------------------------------------------*
+ *å±æ€§åŒºï¼Œç»§æ‰¿è‡ªObserver
+ *------------------------------------------*/
+class PropertyWidget : public Observer
+{
+public:
+	PropertyWidget(Subject *sub);
+
+	void update();
+};
+
+PropertyWidget::PropertyWidget(Subject *sub) : Observer(sub)
+{
+}
+
+void PropertyWidget::update()
+{
+	cout << "property widget update. " << m_subject->getState() << endl;
+};
+
+/*------------------------------------------*
+ *æ—¥å¿—åŒºï¼Œç»§æ‰¿è‡ªObserver
+ *------------------------------------------*/
+class LoggerWidget : public Observer
+{
+public:
+	LoggerWidget(Subject *sub);
+	void update();
+};
+
+LoggerWidget::LoggerWidget(Subject *sub) : Observer(sub)
+{
+}
+void LoggerWidget::update()
+{
+	cout << "logger widget update. " << m_subject->getState() << endl;
+};
+
+/***************/
+Subject::Subject()
+{
+	std::list<Observer *>::iterator pos;
+	for (pos = m_observers.begin(); pos != m_observers.end(); ++pos)
+	{
+		(*pos)->subjectRemoved(this);
+	}
+};
+
+void Subject::notify()
+{
+	for (Observer *ob : m_observers)
+	{
+		ob->update();
+	}
+};
+
+
+/*------------------------------------------*
+ *ä¸»å‡½æ•°
+ *------------------------------------------*/
+int main()
+{
+	MeshPlot meshPlot;
 
 	ViewerWidget viwer(&meshPlot);
 	PropertyWidget property(&meshPlot);
 	LoggerWidget logger(&meshPlot);
-	
+
 	meshPlot.setState("New State.");
 	meshPlot.notify();
- 	
- 	
+
+	getchar();
 };
